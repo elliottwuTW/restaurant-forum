@@ -1,6 +1,9 @@
-module.exports = (app) => {
+const { getRestaurants } = require('../controllers/restController')
 
+module.exports = (app) => {
   app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.redirect('/restaurants')
   })
+
+  app.get('/restaurants', getRestaurants)
 }

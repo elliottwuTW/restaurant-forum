@@ -1,9 +1,10 @@
-const { getRestaurants } = require('../controllers/restController')
+const home = require('./modules/home')
+const admin = require('./modules/admin')
 
 module.exports = (app) => {
-  app.get('/', (req, res) => {
-    res.redirect('/restaurants')
-  })
+  // 前台
+  app.use('/', home)
 
-  app.get('/restaurants', getRestaurants)
+  // 後台
+  app.use('/admin', admin)
 }

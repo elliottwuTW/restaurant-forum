@@ -14,7 +14,7 @@ const createRestaurant = (req, res) => {
   return res.render('admin/create')
 }
 
-// Create a restaurant
+// Create an restaurant
 const postRestaurant = (req, res) => {
   // check restaurant name
   if (!req.body.name) {
@@ -28,8 +28,18 @@ const postRestaurant = (req, res) => {
   })
 }
 
+// Read a specific restaurant
+const getRestaurant = (req, res) => {
+  Restaurant.findByPk(req.params.id)
+    .then((restaurant) => {
+      return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
+    })
+    .catch((err) => console.error(err))
+}
+
 module.exports = {
   getRestaurants,
+  getRestaurant,
   createRestaurant,
   postRestaurant
 }

@@ -54,11 +54,19 @@ const updateRestaurant = (req, res) => {
     .catch((err) => console.error(err))
 }
 
+// Delete a specific restaurant
+const deleteRestaurant = (req, res) => {
+  Restaurant.destroy({ where: { id: req.params.id } })
+    .then(() => res.redirect('/admin/restaurants'))
+    .catch((err) => console.error(err))
+}
+
 module.exports = {
   getRestaurants,
   getRestaurant,
   createRestaurant,
   postRestaurant,
   editRestaurant,
-  updateRestaurant
+  updateRestaurant,
+  deleteRestaurant
 }

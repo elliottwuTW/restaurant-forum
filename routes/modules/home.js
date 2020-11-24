@@ -11,9 +11,10 @@ const {
   signIn,
   logout
 } = require('../../controllers/userController')
+const { authenticated } = require('../../controllers/authController')
 
 router.get('/', (req, res) => res.redirect('/restaurants'))
-router.get('/restaurants', getRestaurants)
+router.get('/restaurants', authenticated, getRestaurants)
 
 router.get('/signup', signUpPage)
 router.post('/signup', signUp)

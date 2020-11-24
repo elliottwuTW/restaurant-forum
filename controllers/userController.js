@@ -36,7 +36,26 @@ const signUp = (req, res) => {
   })
 }
 
+const signInPage = (req, res) => {
+  return res.render('signin')
+}
+
+// sign in successfully
+const signIn = (req, res) => {
+  req.flash('success_messages', '登入成功')
+  return res.redirect('/restaurants')
+}
+
+const logout = (req, res) => {
+  req.flash('success_messages', '登出成功')
+  req.logout()
+  return res.redirect('/signin')
+}
+
 module.exports = {
   signUpPage,
-  signUp
+  signUp,
+  signInPage,
+  signIn,
+  logout
 }

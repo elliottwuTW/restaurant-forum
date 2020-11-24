@@ -37,9 +37,28 @@ const getRestaurant = (req, res) => {
     .catch((err) => console.error(err))
 }
 
+// Edit restaurant page
+const editRestaurant = (req, res) => {
+  Restaurant.findByPk(req.params.id).then((restaurant) =>
+    res.render('admin/create', { restaurant: restaurant.toJSON() })
+  )
+}
+
+// Update a specific restaurant
+const updateRestaurant = (req, res) => {
+  Restaurant.update({ ...req.body }, { where: { id: req.params.id } })
+    .then(() => {
+      req.flash('success_messages', '餐廳資料更新成功')
+      return res.redirect('/admin/restaurants')
+    })
+    .catch((err) => console.error(err))
+}
+
 module.exports = {
   getRestaurants,
   getRestaurant,
   createRestaurant,
-  postRestaurant
+  postRestaurant,
+  editRestaurant,
+  updateRestaurant
 }

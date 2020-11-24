@@ -5,7 +5,9 @@ const {
   getRestaurants,
   getRestaurant,
   createRestaurant,
-  postRestaurant
+  postRestaurant,
+  editRestaurant,
+  updateRestaurant
 } = require('../../controllers/adminController')
 
 const { authenticated, isAdmin } = require('../../middleware/auth')
@@ -18,8 +20,10 @@ router.get('/', (req, res) => {
 })
 
 router.get('/restaurants', getRestaurants)
-router.get('/restaurants/:id', getRestaurant)
 router.get('/restaurants/create', createRestaurant)
+router.get('/restaurants/:id/edit', editRestaurant)
+router.get('/restaurants/:id', getRestaurant)
 router.post('/restaurants', postRestaurant)
+router.put('/restaurants/:id', updateRestaurant)
 
 module.exports = router

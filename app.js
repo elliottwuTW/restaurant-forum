@@ -3,6 +3,7 @@ const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
 const session = require('express-session')
 const flash = require('connect-flash')
+const methodOverride = require('method-override')
 
 const db = require('./models')
 const passport = require('./config/passport')
@@ -20,6 +21,8 @@ app.use(flash())
 // passport
 app.use(passport.initialize())
 app.use(passport.session())
+
+app.use(methodOverride('_method'))
 
 // local vars
 app.use((req, res, next) => {

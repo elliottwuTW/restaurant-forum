@@ -11,7 +11,8 @@ const {
   signIn,
   logout
 } = require('../../controllers/userController')
-const { authenticated } = require('../../controllers/authController')
+
+const { authenticated } = require('../../middleware/auth')
 
 router.get('/', (req, res) => res.redirect('/restaurants'))
 router.get('/restaurants', authenticated, getRestaurants)

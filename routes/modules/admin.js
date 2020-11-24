@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router()
 
 const { getRestaurants } = require('../../controllers/adminController')
-const { authenticated, isAdmin } = require('../../controllers/authController')
+
+const { authenticated, isAdmin } = require('../../middleware/auth')
 
 router.use(authenticated)
 router.use(isAdmin)

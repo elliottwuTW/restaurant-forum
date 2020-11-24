@@ -1,5 +1,12 @@
+const db = require('../models')
+const Restaurant = db.Restaurant
+
+// Get all restaurants
 const getRestaurants = (req, res) => {
-  res.render('admin/restaurants') // can't put a '/' before admin
+  Restaurant.findAll({
+    raw: true,
+    nested: true
+  }).then((restaurants) => res.render('admin/restaurants', { restaurants })) // can't put a '/' before admin)
 }
 
 module.exports = {

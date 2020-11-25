@@ -5,11 +5,15 @@ const bodyParser = require('body-parser')
 const session = require('express-session')
 const flash = require('connect-flash')
 const methodOverride = require('method-override')
+const dotenv = require('dotenv')
 
 const db = require('./models')
 const passport = require('./config/passport')
 const app = express()
-const port = process.env.PORT || 3000
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config()
+}
 
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
@@ -36,8 +40,8 @@ app.use((req, res, next) => {
 // static files for /upload
 app.use('/upload', express.static(path.join(__dirname, '/upload')))
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+app.listen(process.env.PORT, () => {
+  console.log(`Example app listening at http://localhost:${process.env.PORT}`)
 })
 
 // 使用路由

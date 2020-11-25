@@ -1,6 +1,10 @@
-const fs = require('fs')
 const db = require('../models')
 const Restaurant = db.Restaurant
+
+// third-party picture store api
+const imgur = require('imgur-node-api')
+
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 // Get all restaurants
 const getRestaurants = (req, res) => {
@@ -25,16 +29,15 @@ const postRestaurant = (req, res) => {
   // check if file exists in req
   const { file } = req
   if (file) {
-    fs.readFile(file.path, (err, data) => {
+    imgur.setClientID(IMGUR_CLIENT_ID)
+    imgur.upload(file.path, (err, img) => {
       if (err) return console.error(err)
-      fs.writeFile(`upload/${file.originalname}`, data, () => {
-        return Restaurant.create({
-          ...req.body,
-          image: `/upload/${file.originalname}`
-        }).then((restaurant) => {
-          req.flash('success_messages', '餐廳建立成功')
-          res.redirect('/admin/restaurants')
-        })
+      return Restaurant.create({
+        ...req.body,
+        image: img.data.link
+      }).then((restaurant) => {
+        req.flash('success_messages', '餐廳建立成功')
+        res.redirect('/admin/restaurants')
       })
     })
   } else {
@@ -71,20 +74,18 @@ const updateRestaurant = (req, res) => {
 
   const { file } = req
   if (file) {
-    fs.readFile(file.path, (err, data) => {
+    imgur.setClientID(IMGUR_CLIENT_ID)
+    imgur.upload(file.path, (err, img) => {
       if (err) return console.error(err)
-      console.log('file.originalname: ', file.originalname)
-      fs.writeFile(`upload/${file.originalname}`, data, () => {
-        return Restaurant.update(
-          {
-            ...req.body,
-            image: `/upload/${file.originalname}`
-          },
-          { where: { id: req.params.id } }
-        ).then(() => {
-          req.flash('success_messages', '餐廳資料更新成功')
-          res.redirect('/admin/restaurants')
-        })
+      return Restaurant.update(
+        {
+          ...req.body,
+          image: img.data.link
+        },
+        { where: { id: req.params.id } }
+      ).then(() => {
+        req.flash('success_messages', '餐廳資料更新成功')
+        res.redirect('/admin/restaurants')
       })
     })
   } else {

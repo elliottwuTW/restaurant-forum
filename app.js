@@ -1,3 +1,4 @@
+const path = require('path')
 const express = require('express')
 const exphbs = require('express-handlebars')
 const bodyParser = require('body-parser')
@@ -31,6 +32,9 @@ app.use((req, res, next) => {
   res.locals.user = req.user
   next()
 })
+
+// static files for /upload
+app.use('/upload', express.static(path.join(__dirname, '/upload')))
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)

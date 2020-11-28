@@ -11,7 +11,8 @@ const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 const getRestaurants = (req, res) => {
   Restaurant.findAll({
     raw: true,
-    nested: true
+    nested: true,
+    order: [['createdAt', 'DESC']]
   }).then((restaurants) => res.render('admin/restaurants', { restaurants })) // can't put a '/' before admin
 }
 

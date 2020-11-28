@@ -9,13 +9,15 @@ const dotenv = require('dotenv')
 
 const db = require('./models')
 const passport = require('./config/passport')
+const _helpers = require('./_helpers')
+const helpers = require('./utils/exphbsHelper')
 const app = express()
 
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config()
 }
 
-app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
+app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs', helpers }))
 app.set('view engine', 'hbs')
 
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -33,7 +35,7 @@ app.use(methodOverride('_method'))
 app.use((req, res, next) => {
   res.locals.success_messages = req.flash('success_messages')
   res.locals.error_messages = req.flash('error_messages')
-  res.locals.user = req.user
+  res.locals.user = _helpers.getUser(req)
   next()
 })
 

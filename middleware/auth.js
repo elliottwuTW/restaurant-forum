@@ -1,12 +1,14 @@
+const helpers = require('../_helpers')
+
 const authenticated = (req, res, next) => {
-  if (!req.isAuthenticated()) {
+  if (!helpers.ensureAuthenticated(req)) {
     return res.redirect('/signin')
   }
   next()
 }
 
 const isAdmin = (req, res, next) => {
-  if (!req.user.isAdmin) {
+  if (!helpers.getUser(req).isAdmin) {
     return res.redirect('/')
   }
   next()

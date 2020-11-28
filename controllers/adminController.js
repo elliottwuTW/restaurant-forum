@@ -1,4 +1,5 @@
 const db = require('../models')
+const User = db.User
 const Restaurant = db.Restaurant
 
 // third-party picture store api
@@ -107,6 +108,28 @@ const deleteRestaurant = (req, res) => {
     .catch((err) => console.error(err))
 }
 
+// Get all users
+const getUsers = (req, res) => {
+  User.findAll({
+    raw: true,
+    nested: true
+  }).then((users) => res.render('admin/users', { users }))
+}
+
+// Update user authority
+const putUsers = (req, res) => {
+  User.findByPk(req.params.id)
+    .then((user) => {
+      user.isAdmin = !user.isAdmin
+      req.flash(
+        'success_messages',
+        `${user.name} 權限更改成功，目前為 ${user.isAdmin ? 'admin' : 'user'}`
+      )
+      return user.save()
+    })
+    .then(() => res.redirect('/admin/users'))
+}
+
 module.exports = {
   getRestaurants,
   getRestaurant,
@@ -114,5 +137,7 @@ module.exports = {
   postRestaurant,
   editRestaurant,
   updateRestaurant,
-  deleteRestaurant
+  deleteRestaurant,
+  getUsers,
+  putUsers
 }

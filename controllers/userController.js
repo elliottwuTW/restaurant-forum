@@ -1,6 +1,11 @@
-const bcrypt = require('bcryptjs')
 const db = require('../models')
 const User = db.User
+
+// error handle method
+const {
+  allValidationError,
+  errorMsgToArray
+} = require('../utils/errorHandleHelper')
 
 const signUpPage = (req, res) => {
   return res.render('signup')
@@ -9,29 +14,29 @@ const signUpPage = (req, res) => {
 const signUp = (req, res) => {
   // password check
   if (req.body.password !== req.body.passwordCheck) {
-    req.flash('error_messages', '密碼不同')
-    return res.redirect('/signup')
+    const validationErrorMsg = ['密碼不同']
+    return res.render('signup', { user: req.body, validationErrorMsg })
   }
   // check user
   User.findOne({ where: { email: req.body.email } }).then((user) => {
     if (user) {
-      req.flash('error_messages', 'email 已註冊')
-      return res.redirect('/signup')
+      const validationErrorMsg = ['email 已註冊']
+      return res.render('signup', { user: req.body, validationErrorMsg })
     }
-    // hash password
-    bcrypt
-      .genSalt(10)
-      .then((salt) => bcrypt.hash(req.body.password, salt))
-      .then((hash) => {
-        req.body.password = hash
-        User.create(req.body)
-          .then(() => {
-            req.flash('suceess_messages', '註冊成功')
-            return res.redirect('/signin')
-          })
-          .catch((err) => console.error(err))
+
+    User.create(req.body)
+      .then(() => {
+        req.flash('success_messages', '註冊成功')
+        return res.redirect('/signin')
       })
-      .catch((err) => console.error(err))
+      .catch((err) => {
+        if (allValidationError(err.errors)) {
+          const validationErrorMsg = errorMsgToArray(err.message)
+          return res.render('signup', { user: req.body, validationErrorMsg })
+        } else {
+          console.error(err)
+        }
+      })
   })
 }
 

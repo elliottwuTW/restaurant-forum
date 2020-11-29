@@ -13,10 +13,46 @@ module.exports = (sequelize, DataTypes) => {
   }
   Restaurant.init(
     {
-      name: DataTypes.STRING,
-      tel: DataTypes.STRING,
-      address: DataTypes.STRING,
-      opening_hours: DataTypes.STRING,
+      name: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        validate: {
+          notEmpty: {
+            msg: '請填入餐廳名稱'
+          }
+        }
+      },
+      tel: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        validate: {
+          notEmpty: {
+            msg: '請填入餐廳電話'
+          },
+          is: {
+            args: /^\(?(0[0-9])\)?[-]([0-9]{4})[-]([0-9]{4})$/,
+            msg: '請確認電話格式'
+          }
+        }
+      },
+      address: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        validate: {
+          notEmpty: {
+            msg: '請填入餐廳地址'
+          }
+        }
+      },
+      opening_hours: {
+        type: DataTypes.STRING,
+        defaultValue: '',
+        validate: {
+          notEmpty: {
+            msg: '請填入開店時間'
+          }
+        }
+      },
       description: DataTypes.TEXT,
       image: DataTypes.STRING
     },

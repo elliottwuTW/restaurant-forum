@@ -7,6 +7,12 @@ const imgur = require('imgur-node-api')
 
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
+// error handle method
+const {
+  allValidationError,
+  errorMsgToArray
+} = require('../utils/errorHandleHelper')
+
 // Get all restaurants
 const getRestaurants = (req, res) => {
   Restaurant.findAll({
@@ -22,12 +28,7 @@ const createRestaurant = (req, res) => {
 }
 
 // Create an restaurant
-const postRestaurant = (req, res) => {
-  // check restaurant name
-  if (!req.body.name) {
-    req.flash('error_messages', '請填入餐廳名稱')
-    return res.redirect('back')
-  }
+const postRestaurant = (req, res, next) => {
   // check if file exists in req
   const { file } = req
   if (file) {
@@ -37,16 +38,40 @@ const postRestaurant = (req, res) => {
       return Restaurant.create({
         ...req.body,
         image: img.data.link
-      }).then((restaurant) => {
+      })
+        .then((restaurant) => {
+          req.flash('success_messages', '餐廳建立成功')
+          res.redirect('/admin/restaurants')
+        })
+        .catch((err) => {
+          if (allValidationError(err.errors)) {
+            const validationErrorMsg = errorMsgToArray(err.message)
+            return res.render('admin/create', {
+              restaurant: req.body,
+              validationErrorMsg
+            })
+          } else {
+            console.error(err)
+          }
+        })
+    })
+  } else {
+    Restaurant.create({ ...req.body, image: null })
+      .then((restaurant) => {
         req.flash('success_messages', '餐廳建立成功')
         res.redirect('/admin/restaurants')
       })
-    })
-  } else {
-    Restaurant.create({ ...req.body, image: null }).then((restaurant) => {
-      req.flash('success_messages', '餐廳建立成功')
-      res.redirect('/admin/restaurants')
-    })
+      .catch((err) => {
+        if (allValidationError(err.errors)) {
+          const validationErrorMsg = errorMsgToArray(err.message)
+          return res.render('admin/create', {
+            restaurant: req.body,
+            validationErrorMsg
+          })
+        } else {
+          console.error(err)
+        }
+      })
   }
 }
 
@@ -62,18 +87,12 @@ const getRestaurant = (req, res) => {
 // Edit restaurant page
 const editRestaurant = (req, res) => {
   Restaurant.findByPk(req.params.id).then((restaurant) =>
-    res.render('admin/create', { restaurant: restaurant.toJSON() })
+    res.render('admin/edit', { restaurant: restaurant.toJSON() })
   )
 }
 
 // Update a specific restaurant
 const updateRestaurant = (req, res) => {
-  // check restaurant name
-  if (!req.body.name) {
-    req.flash('error_messages', '請填入餐廳名稱')
-    return res.redirect('back')
-  }
-
   const { file } = req
   if (file) {
     imgur.setClientID(IMGUR_CLIENT_ID)
@@ -85,20 +104,44 @@ const updateRestaurant = (req, res) => {
           image: img.data.link
         },
         { where: { id: req.params.id } }
-      ).then(() => {
-        req.flash('success_messages', '餐廳資料更新成功')
-        res.redirect('/admin/restaurants')
-      })
+      )
+        .then(() => {
+          req.flash('success_messages', '餐廳資料更新成功')
+          res.redirect('/admin/restaurants')
+        })
+        .catch((err) => {
+          if (allValidationError(err.errors)) {
+            const validationErrorMsg = errorMsgToArray(err.message)
+            console.log('req.params.id: ', req.params.id)
+            return res.render('admin/edit', {
+              restaurant: { id: req.params.id, ...req.body },
+              validationErrorMsg
+            })
+          } else {
+            console.error(err)
+          }
+        })
     })
   } else {
-    Restaurant.findByPk(req.params.id)
-      .then((restaurant) => {
-        restaurant.update({ ...req.body, image: restaurant.image }).then(() => {
+    Restaurant.findByPk(req.params.id).then((restaurant) => {
+      restaurant
+        .update({ ...req.body, image: restaurant.image })
+        .then(() => {
           req.flash('success_messages', '餐廳資料更新成功')
           return res.redirect('/admin/restaurants')
         })
-      })
-      .catch((err) => console.error(err))
+        .catch((err) => {
+          if (allValidationError(err.errors)) {
+            const validationErrorMsg = errorMsgToArray(err.message)
+            return res.render('admin/edit', {
+              restaurant: { id: req.params.id, ...req.body },
+              validationErrorMsg
+            })
+          } else {
+            console.error(err)
+          }
+        })
+    })
   }
 }
 

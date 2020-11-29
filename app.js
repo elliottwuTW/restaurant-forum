@@ -35,6 +35,10 @@ app.use(methodOverride('_method'))
 app.use((req, res, next) => {
   res.locals.success_messages = req.flash('success_messages')
   res.locals.error_messages = req.flash('error_messages')
+  res.locals.restaurant =
+    req.flash('restaurant').length !== 0
+      ? JSON.parse(req.flash('restaurant'))
+      : []
   res.locals.user = _helpers.getUser(req)
   next()
 })

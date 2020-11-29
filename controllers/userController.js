@@ -12,9 +12,8 @@ const signUp = (req, res) => {
     req.flash('error_messages', '密碼不同')
     return res.redirect('/signup')
   }
-
   // check user
-  User.findOne({ email: req.body.email }).then((user) => {
+  User.findOne({ where: { email: req.body.email } }).then((user) => {
     if (user) {
       req.flash('error_messages', 'email 已註冊')
       return res.redirect('/signup')

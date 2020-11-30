@@ -28,7 +28,7 @@ const createRestaurant = (req, res) => {
 }
 
 // Create an restaurant
-const postRestaurant = (req, res, next) => {
+const postRestaurant = (req, res) => {
   // check if file exists in req
   const { file } = req
   if (file) {

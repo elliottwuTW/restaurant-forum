@@ -19,7 +19,7 @@ const getRestaurants = (req, res) => {
   Restaurant.findAll({
     raw: true,
     nest: true,
-    order: [['createdAt', 'DESC']],
+    order: [['updatedAt', 'DESC']],
     include: { model: Category, attributes: ['name'] }
   }).then((restaurants) => {
     return res.render('admin/restaurants', { restaurants })
@@ -28,7 +28,9 @@ const getRestaurants = (req, res) => {
 
 // New restaurant page
 const createRestaurant = (req, res) => {
-  return res.render('admin/create')
+  Category.findAll({ raw: true, nest: true }).then((categories) => {
+    return res.render('admin/create', { categories })
+  })
 }
 
 // Create an restaurant
@@ -41,7 +43,9 @@ const postRestaurant = (req, res) => {
       if (err) return console.error(err)
       return Restaurant.create({
         ...req.body,
-        image: img.data.link
+        image: img.data.link,
+        // Foreign key
+        CategoryId: req.body.categoryId
       })
         .then((restaurant) => {
           req.flash('success_messages', '餐廳建立成功')
@@ -60,7 +64,11 @@ const postRestaurant = (req, res) => {
         })
     })
   } else {
-    Restaurant.create({ ...req.body, image: null })
+    Restaurant.create({
+      ...req.body,
+      image: null,
+      CategoryId: req.body.categoryId
+    })
       .then((restaurant) => {
         req.flash('success_messages', '餐廳建立成功')
         res.redirect('/admin/restaurants')
@@ -92,8 +100,13 @@ const getRestaurant = (req, res) => {
 
 // Edit restaurant page
 const editRestaurant = (req, res) => {
-  Restaurant.findByPk(req.params.id).then((restaurant) =>
-    res.render('admin/edit', { restaurant: restaurant.toJSON() })
+  Category.findAll({ raw: true, nest: true }).then((categories) =>
+    Restaurant.findByPk(req.params.id).then((restaurant) => {
+      return res.render('admin/edit', {
+        restaurant: restaurant.toJSON(),
+        categories
+      })
+    })
   )
 }
 
@@ -107,7 +120,8 @@ const updateRestaurant = (req, res) => {
       return Restaurant.update(
         {
           ...req.body,
-          image: img.data.link
+          image: img.data.link,
+          CategoryId: req.body.categoryId
         },
         { where: { id: req.params.id } }
       )
@@ -131,7 +145,11 @@ const updateRestaurant = (req, res) => {
   } else {
     Restaurant.findByPk(req.params.id).then((restaurant) => {
       restaurant
-        .update({ ...req.body, image: restaurant.image })
+        .update({
+          ...req.body,
+          image: restaurant.image,
+          CategoryId: req.body.categoryId
+        })
         .then(() => {
           req.flash('success_messages', '餐廳資料更新成功')
           return res.redirect('/admin/restaurants')

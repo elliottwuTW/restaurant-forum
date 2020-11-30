@@ -1,6 +1,7 @@
 const db = require('../models')
 const User = db.User
 const Restaurant = db.Restaurant
+const Category = db.Category
 
 // third-party picture store api
 const imgur = require('imgur-node-api')
@@ -17,9 +18,12 @@ const {
 const getRestaurants = (req, res) => {
   Restaurant.findAll({
     raw: true,
-    nested: true,
-    order: [['createdAt', 'DESC']]
-  }).then((restaurants) => res.render('admin/restaurants', { restaurants })) // can't put a '/' before admin
+    nest: true,
+    order: [['createdAt', 'DESC']],
+    include: { model: Category, attributes: ['name'] }
+  }).then((restaurants) => {
+    return res.render('admin/restaurants', { restaurants })
+  })
 }
 
 // New restaurant page
@@ -77,7 +81,9 @@ const postRestaurant = (req, res) => {
 
 // Read a specific restaurant
 const getRestaurant = (req, res) => {
-  Restaurant.findByPk(req.params.id)
+  Restaurant.findByPk(req.params.id, {
+    include: { model: Category, attributes: ['name'] }
+  })
     .then((restaurant) => {
       return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
     })

@@ -13,7 +13,13 @@ module.exports = (sequelize, DataTypes) => {
   }
   Category.init(
     {
-      name: DataTypes.STRING
+      name: {
+        type: DataTypes.STRING,
+        default: '',
+        validate: {
+          notEmpty: { msg: '分類名稱不可為空' }
+        }
+      }
     },
     {
       sequelize,

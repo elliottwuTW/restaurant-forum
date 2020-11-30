@@ -16,6 +16,13 @@ const {
   putUsers
 } = require('../../controllers/adminController')
 
+const {
+  getCategories,
+  createCategory,
+  putCategory,
+  deleteCategory
+} = require('../../controllers/categoryController')
+
 const { authenticated, isAdmin } = require('../../middleware/auth')
 
 router.use(authenticated)
@@ -33,6 +40,13 @@ router.get('/restaurants/:id', getRestaurant)
 router.post('/restaurants', upload.single('image'), postRestaurant)
 router.put('/restaurants/:id', upload.single('image'), updateRestaurant)
 router.delete('/restaurants/:id', deleteRestaurant)
+
+// categories
+router.get('/categories', getCategories)
+router.get('/categories/:id', getCategories)
+router.post('/categories', createCategory)
+router.put('/categories/:id', putCategory)
+router.delete('/categories/:id', deleteCategory)
 
 // users
 router.get('/users', getUsers)

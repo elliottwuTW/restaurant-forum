@@ -3,7 +3,10 @@ const router = express.Router()
 
 const passport = require('passport')
 
-const { getRestaurants } = require('../../controllers/restController')
+const {
+  getRestaurants,
+  getRestaurant
+} = require('../../controllers/restController')
 const {
   signUpPage,
   signUp,
@@ -16,6 +19,7 @@ const { authenticated } = require('../../middleware/auth')
 
 router.get('/', (req, res) => res.redirect('/restaurants'))
 router.get('/restaurants', authenticated, getRestaurants)
+router.get('/restaurants/:id', authenticated, getRestaurant)
 
 router.get('/signup', signUpPage)
 router.post('/signup', signUp)

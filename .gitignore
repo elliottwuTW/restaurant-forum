@@ -1,6 +1,7 @@
 node_modules/ 
 temp/
 upload/
+project-info.md
 
 .DS_Store
 .env

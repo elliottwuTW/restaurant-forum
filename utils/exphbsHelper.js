@@ -1,3 +1,7 @@
 module.exports = {
-  equal: (a, b) => a === b
+  equal: (a, b) => {
+    if (typeof a !== 'undefined' && typeof b !== 'undefined') {
+      return a.toString() === b.toString()
+    }
+  }
 }

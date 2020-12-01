@@ -10,8 +10,8 @@
   </div>
 
   <div class="form-group">
-    <label for="categoryId">Category</label>
-    <select class="form-control" id="categoryId" name="categoryId">
+    <label for="CategoryId">Category</label>
+    <select class="form-control" id="CategoryId" name="CategoryId">
       {{#each categories}}
       <option value="{{this.id}}" {{#if (equal this.id ../restaurant.CategoryId)}}selected{{/if}}>{{this.name}}</option>
       {{/each}}

@@ -15,187 +15,152 @@ const {
 } = require('../utils/errorHandleHelper')
 
 // Get all restaurants
-const getRestaurants = (req, res) => {
-  Restaurant.findAll({
+const getRestaurants = async (req, res) => {
+  const restaurants = await Restaurant.findAll({
     raw: true,
     nest: true,
     order: [['updatedAt', 'DESC']],
     include: { model: Category, attributes: ['name'] }
-  }).then((restaurants) => {
-    return res.render('admin/restaurants', { restaurants })
   })
+  return res.render('admin/restaurants', { restaurants })
 }
 
 // New restaurant page
-const createRestaurant = (req, res) => {
-  Category.findAll({ raw: true, nest: true }).then((categories) => {
-    return res.render('admin/create', { categories })
-  })
+const createRestaurant = async (req, res) => {
+  const categories = await Category.findAll({ raw: true, nest: true })
+  return res.render('admin/create', { categories })
 }
 
 // Create an restaurant
-const postRestaurant = (req, res) => {
+const postRestaurant = async (req, res) => {
   // check if file exists in req
   const { file } = req
-  if (file) {
-    imgur.setClientID(IMGUR_CLIENT_ID)
-    imgur.upload(file.path, (err, img) => {
-      if (err) return console.error(err)
-      return Restaurant.create({
+  try {
+    if (file) {
+      imgur.setClientID(IMGUR_CLIENT_ID)
+      const img = await imgurUpload(file)
+      await Restaurant.create({
         ...req.body,
         image: img.data.link,
         // Foreign key
-        CategoryId: req.body.categoryId
+        CategoryId: req.body.CategoryId
       })
-        .then((restaurant) => {
-          req.flash('success_messages', '餐廳建立成功')
-          res.redirect('/admin/restaurants')
-        })
-        .catch((err) => {
-          if (allValidationError(err.errors)) {
-            const validationErrorMsg = errorMsgToArray(err.message)
-            return res.render('admin/create', {
-              restaurant: req.body,
-              validationErrorMsg
-            })
-          } else {
-            console.error(err)
-          }
-        })
-    })
-  } else {
-    Restaurant.create({
-      ...req.body,
-      image: null,
-      CategoryId: req.body.categoryId
-    })
-      .then((restaurant) => {
-        req.flash('success_messages', '餐廳建立成功')
-        res.redirect('/admin/restaurants')
+    } else {
+      await Restaurant.create({
+        ...req.body,
+        image: null,
+        CategoryId: req.body.CategoryId
       })
-      .catch((err) => {
-        if (allValidationError(err.errors)) {
-          const validationErrorMsg = errorMsgToArray(err.message)
-          return res.render('admin/create', {
-            restaurant: req.body,
-            validationErrorMsg
-          })
-        } else {
-          console.error(err)
-        }
+    }
+    req.flash('success_messages', '餐廳建立成功')
+    return res.redirect('/admin/restaurants')
+  } catch (err) {
+    if (allValidationError(err.errors)) {
+      const validationErrorMsg = errorMsgToArray(err.message)
+      const categories = await Category.findAll({ raw: true, nest: true })
+      return res.render('admin/create', {
+        restaurant: req.body,
+        categories,
+        validationErrorMsg
       })
+    } else {
+      console.error(err)
+    }
   }
 }
 
 // Read a specific restaurant
-const getRestaurant = (req, res) => {
-  Restaurant.findByPk(req.params.id, {
+const getRestaurant = async (req, res) => {
+  const restaurant = await Restaurant.findByPk(req.params.id, {
     include: { model: Category, attributes: ['name'] }
   })
-    .then((restaurant) => {
-      return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
-    })
-    .catch((err) => console.error(err))
+  return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
 }
 
 // Edit restaurant page
-const editRestaurant = (req, res) => {
-  Category.findAll({ raw: true, nest: true }).then((categories) =>
-    Restaurant.findByPk(req.params.id).then((restaurant) => {
-      return res.render('admin/edit', {
-        restaurant: restaurant.toJSON(),
-        categories
-      })
-    })
-  )
+const editRestaurant = async (req, res) => {
+  const categories = await Category.findAll({ raw: true, nest: true })
+  const restaurant = await Restaurant.findByPk(req.params.id)
+  return res.render('admin/edit', {
+    restaurant: restaurant.toJSON(),
+    categories
+  })
 }
 
 // Update a specific restaurant
-const updateRestaurant = (req, res) => {
+const updateRestaurant = async (req, res) => {
   const { file } = req
-  if (file) {
-    imgur.setClientID(IMGUR_CLIENT_ID)
-    imgur.upload(file.path, (err, img) => {
-      if (err) return console.error(err)
-      return Restaurant.update(
-        {
-          ...req.body,
-          image: img.data.link,
-          CategoryId: req.body.categoryId
-        },
-        { where: { id: req.params.id } }
-      )
-        .then(() => {
-          req.flash('success_messages', '餐廳資料更新成功')
-          res.redirect('/admin/restaurants')
-        })
-        .catch((err) => {
-          if (allValidationError(err.errors)) {
-            const validationErrorMsg = errorMsgToArray(err.message)
-            console.log('req.params.id: ', req.params.id)
-            return res.render('admin/edit', {
-              restaurant: { id: req.params.id, ...req.body },
-              validationErrorMsg
-            })
-          } else {
-            console.error(err)
-          }
-        })
-    })
-  } else {
-    Restaurant.findByPk(req.params.id).then((restaurant) => {
-      restaurant
-        .update({
-          ...req.body,
-          image: restaurant.image,
-          CategoryId: req.body.categoryId
-        })
-        .then(() => {
-          req.flash('success_messages', '餐廳資料更新成功')
-          return res.redirect('/admin/restaurants')
-        })
-        .catch((err) => {
-          if (allValidationError(err.errors)) {
-            const validationErrorMsg = errorMsgToArray(err.message)
-            return res.render('admin/edit', {
-              restaurant: { id: req.params.id, ...req.body },
-              validationErrorMsg
-            })
-          } else {
-            console.error(err)
-          }
-        })
-    })
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.id)
+    if (!restaurant) {
+      req.flash('error_messages', '餐廳中無此 id')
+      return res.redirect('back')
+    }
+
+    if (file) {
+      imgur.setClientID(IMGUR_CLIENT_ID)
+      const img = await imgurUpload(file)
+      await restaurant.update({
+        ...req.body,
+        image: img.data.link
+      })
+    } else {
+      await restaurant.update({
+        ...req.body,
+        image: restaurant.image
+      })
+    }
+    req.flash('success_messages', '餐廳資料更新成功')
+    return res.redirect('/admin/restaurants')
+  } catch (err) {
+    if (allValidationError(err.errors)) {
+      const validationErrorMsg = errorMsgToArray(err.message)
+      const categories = await Category.findAll({ raw: true, nest: true })
+      return res.render('admin/edit', {
+        restaurant: { id: req.params.id, ...req.body },
+        categories,
+        validationErrorMsg
+      })
+    } else {
+      console.error(err)
+    }
   }
 }
 
 // Delete a specific restaurant
-const deleteRestaurant = (req, res) => {
-  Restaurant.destroy({ where: { id: req.params.id } })
-    .then(() => res.redirect('/admin/restaurants'))
-    .catch((err) => console.error(err))
+const deleteRestaurant = async (req, res) => {
+  await Restaurant.destroy({ where: { id: req.params.id } })
+  return res.redirect('/admin/restaurants')
 }
 
 // Get all users
-const getUsers = (req, res) => {
-  User.findAll({
-    raw: true,
-    nested: true
-  }).then((users) => res.render('admin/users', { users }))
+const getUsers = async (req, res) => {
+  const users = await User.findAll({ raw: true, nested: true })
+  return res.render('admin/users', { users })
 }
 
 // Update user authority
-const putUsers = (req, res) => {
-  User.findByPk(req.params.id)
-    .then((user) => {
-      user.isAdmin = !user.isAdmin
-      req.flash(
-        'success_messages',
-        `${user.name} 權限更改成功，目前為 ${user.isAdmin ? 'admin' : 'user'}`
-      )
-      return user.save()
+const putUsers = async (req, res) => {
+  const user = await User.findByPk(req.params.id)
+  user.isAdmin = !user.isAdmin
+  req.flash(
+    'success_messages',
+    `${user.name} 權限更改成功，目前為 ${user.isAdmin ? 'admin' : 'user'}`
+  )
+  await user.save()
+  return res.redirect('/admin/users')
+}
+
+// imgur upload promise
+const imgurUpload = (file) => {
+  return new Promise((resolve, reject) => {
+    imgur.upload(file.path, (err, img) => {
+      if (err) {
+        return reject(err)
+      }
+      return resolve(img)
     })
-    .then(() => res.redirect('/admin/users'))
+  })
 }
 
 module.exports = {

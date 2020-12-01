@@ -44,11 +44,7 @@ const signInPage = (req, res) => {
 // sign in successfully
 const signIn = (req, res) => {
   req.flash('success_messages', '登入成功')
-  if (req.user.isAdmin) {
-    return res.redirect('/admin/restaurants')
-  } else {
-    return res.redirect('/restaurants')
-  }
+  return res.redirect('/restaurants')
 }
 
 const logout = (req, res) => {

@@ -7,11 +7,26 @@
       <div class="card-body">
         <h5 class="card-title">{{displayUser.name}}</h5>
         <h6 class="card-subtitle mb-2 text-muted">{{displayUser.email}}</h6>
+        <ul class="list-unstyled">
+          <li><strong>{{displayUser.Comments.length}}</strong> 已評論餐廳</li>
+        </ul>
         {{#if (equal displayUser.id user.id)}}
         <a href="/users/{{displayUser.id}}/edit" class="btn btn-primary mt-3">Edit</a>
         {{/if}}
       </div>
     </div>
     <hr>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>{{displayUser.Comments.length}}</strong> 已評論餐廳
+  </div>
+  <div class="card-body">
+    {{#each displayUser.Comments}}
+    <a href="/restaurants/{{this.RestaurantId}}">
+      <img src="{{this.Restaurant.image}}" width="60px" height="60px" class="avatar">
+    </a>
+    {{/each}}
   </div>
 </div>

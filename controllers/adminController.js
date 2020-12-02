@@ -3,11 +3,7 @@ const User = db.User
 const Restaurant = db.Restaurant
 const Category = db.Category
 
-// third-party picture store api
-const imgur = require('imgur-node-api')
-
 const imgurUpload = require('../utils/imgurUpload')
-const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 // error handle method
 const {
@@ -38,7 +34,6 @@ const postRestaurant = async (req, res) => {
   const { file } = req
   try {
     if (file) {
-      imgur.setClientID(IMGUR_CLIENT_ID)
       const img = await imgurUpload(file)
       await Restaurant.create({
         ...req.body,
@@ -99,7 +94,6 @@ const updateRestaurant = async (req, res) => {
     }
 
     if (file) {
-      imgur.setClientID(IMGUR_CLIENT_ID)
       const img = await imgurUpload(file)
       await restaurant.update({
         ...req.body,

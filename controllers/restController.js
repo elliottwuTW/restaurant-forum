@@ -1,6 +1,8 @@
 const db = require('../models')
 const Restaurant = db.Restaurant
 const Category = db.Category
+const Comment = db.Comment
+const User = db.User
 
 const getRestaurants = async (req, res) => {
   const reqQuery = {}
@@ -60,13 +62,18 @@ const getRestaurants = async (req, res) => {
 
 const getRestaurant = async (req, res) => {
   const restaurant = await Restaurant.findByPk(req.params.id, {
-    include: { model: Category, attributes: ['name'] }
+    include: [
+      Category,
+      {
+        model: Comment,
+        include: [User]
+      }
+    ]
   })
   if (!restaurant) {
     req.flash('error_messages', '餐廳中無此 id')
     return res.redirect('back')
   }
-
   return res.render('restaurant', { restaurant: restaurant.toJSON() })
 }
 

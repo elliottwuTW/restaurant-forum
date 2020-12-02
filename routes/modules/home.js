@@ -15,11 +15,15 @@ const {
   logout
 } = require('../../controllers/userController')
 
+const { postComment } = require('../../controllers/commentController')
+
 const { authenticated } = require('../../middleware/auth')
 
 router.get('/', (req, res) => res.redirect('/restaurants'))
 router.get('/restaurants', authenticated, getRestaurants)
 router.get('/restaurants/:id', authenticated, getRestaurant)
+
+router.post('/comments', authenticated, postComment)
 
 router.get('/signup', signUpPage)
 router.post('/signup', signUp)

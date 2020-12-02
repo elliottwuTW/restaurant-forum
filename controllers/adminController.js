@@ -6,6 +6,7 @@ const Category = db.Category
 // third-party picture store api
 const imgur = require('imgur-node-api')
 
+const imgurUpload = require('../utils/imgurUpload')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 // error handle method
@@ -149,18 +150,6 @@ const putUsers = async (req, res) => {
   )
   await user.save()
   return res.redirect('/admin/users')
-}
-
-// imgur upload promise
-const imgurUpload = (file) => {
-  return new Promise((resolve, reject) => {
-    imgur.upload(file.path, (err, img) => {
-      if (err) {
-        return reject(err)
-      }
-      return resolve(img)
-    })
-  })
 }
 
 module.exports = {

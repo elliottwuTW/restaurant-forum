@@ -3,6 +3,9 @@ const router = express.Router()
 
 const passport = require('passport')
 
+const multer = require('multer')
+const upload = multer({ dest: 'temp/' })
+
 const {
   getRestaurants,
   getRestaurant
@@ -12,7 +15,10 @@ const {
   signUp,
   signInPage,
   signIn,
-  logout
+  logout,
+  getUser,
+  editUser,
+  putUser
 } = require('../../controllers/userController')
 
 const {
@@ -22,13 +28,21 @@ const {
 
 const { authenticated, isAdmin } = require('../../middleware/auth')
 
+// restaurants
 router.get('/', (req, res) => res.redirect('/restaurants'))
 router.get('/restaurants', authenticated, getRestaurants)
 router.get('/restaurants/:id', authenticated, getRestaurant)
 
+// comments
 router.post('/comments', authenticated, postComment)
 router.delete('/comments/:id', authenticated, isAdmin, deleteComment)
 
+// users
+router.get('/users/:id', authenticated, getUser)
+router.get('/users/:id/edit', authenticated, editUser)
+router.put('/users/:id', authenticated, upload.single('image'), putUser)
+
+// signup/signin/logout
 router.get('/signup', signUpPage)
 router.post('/signup', signUp)
 

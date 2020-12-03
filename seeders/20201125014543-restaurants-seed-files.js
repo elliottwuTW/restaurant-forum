@@ -6,7 +6,8 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.bulkInsert(
       'Restaurants',
-      Array.from({ length: 50 }).map((_) => ({
+      Array.from({ length: 50 }).map((_, index) => ({
+        id: 1 + index * 10,
         name: faker.name.findName(),
         tel: faker.phone.phoneNumber(),
         address: faker.address.streetAddress(),

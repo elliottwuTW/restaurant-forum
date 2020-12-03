@@ -1,11 +1,17 @@
 const db = require('../models')
 const User = db.User
+const Comment = db.Comment
+const Restaurant = db.Restaurant
+
+const _helpers = require('../_helpers')
 
 // error handle method
 const {
   allValidationError,
   errorMsgToArray
 } = require('../utils/errorHandleHelper')
+
+const imgurUpload = require('../utils/imgurUpload')
 
 const signUpPage = (req, res) => {
   return res.render('signup')
@@ -53,10 +59,65 @@ const logout = (req, res) => {
   return res.redirect('/signin')
 }
 
+const getUser = async (req, res) => {
+  const user = await checkUserAndReturn(req, res)
+  return res.render('user', { displayUser: user.toJSON() })
+}
+
+const editUser = async (req, res) => {
+  const user = await checkUserAndReturn(req, res)
+  if (user.id !== _helpers.getUser(req).id) {
+    return res.redirect('back')
+  }
+  return res.render('userEdit', { displayUser: user.toJSON() })
+}
+
+const putUser = async (req, res) => {
+  const { file } = req
+  try {
+    const user = await checkUserAndReturn(req, res)
+    if (file) {
+      const img = await imgurUpload(file)
+      await user.update({
+        name: req.body.name,
+        image: img.data.link
+      })
+    } else {
+      await user.update({
+        name: req.body.name,
+        image: user.image
+      })
+    }
+    req.flash('success_messages', '個人檔案更新成功')
+    return res.redirect(`/users/${user.id}`)
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+const checkUserAndReturn = async (req, res) => {
+  const user = await User.findByPk(req.params.id, {
+    include: [
+      {
+        model: Comment,
+        include: [Restaurant]
+      }
+    ]
+  })
+  if (!user) {
+    req.flash('error_messages', '無此使用者 id')
+    return res.redirect(`/users/${_helpers.getUser(req).id}`)
+  }
+  return user
+}
+
 module.exports = {
   signUpPage,
   signUp,
   signInPage,
   signIn,
-  logout
+  logout,
+  getUser,
+  editUser,
+  putUser
 }

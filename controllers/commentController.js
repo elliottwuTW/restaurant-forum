@@ -2,6 +2,8 @@ const db = require('../models')
 const Comment = db.Comment
 const Restaurant = db.Restaurant
 
+const { getUser } = require('../_helpers')
+
 // error handle method
 const {
   allValidationError,
@@ -18,7 +20,7 @@ const postComment = async (req, res) => {
     await Comment.create({
       text: req.body.text,
       RestaurantId: restaurant.id,
-      UserId: req.user.id
+      UserId: getUser(req).id
     })
     return res.redirect(`/restaurants/${restaurant.id}`)
   } catch (err) {
@@ -38,7 +40,7 @@ const deleteComment = async (req, res) => {
     req.flash('error_messages', '評論中無此 id')
     return res.redirect('back')
   }
-  if (!req.user.isAdmin) {
+  if (!getUser(req).isAdmin) {
     req.flash('error_messages', '權限不足')
     return res.redirect('back')
   }

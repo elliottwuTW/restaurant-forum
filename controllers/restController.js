@@ -74,6 +74,7 @@ const getRestaurant = async (req, res) => {
     req.flash('error_messages', '餐廳中無此 id')
     return res.redirect('back')
   }
+  await restaurant.increment('viewCounts')
   return res.render('restaurant', { restaurant: restaurant.toJSON() })
 }
 

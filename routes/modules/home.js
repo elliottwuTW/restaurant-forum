@@ -8,7 +8,8 @@ const upload = multer({ dest: 'temp/' })
 
 const {
   getRestaurants,
-  getRestaurant
+  getRestaurant,
+  getFeeds
 } = require('../../controllers/restController')
 const {
   signUpPage,
@@ -31,6 +32,7 @@ const { authenticated, isAdmin } = require('../../middleware/auth')
 // restaurants
 router.get('/', (req, res) => res.redirect('/restaurants'))
 router.get('/restaurants', authenticated, getRestaurants)
+router.get('/restaurants/feeds', authenticated, getFeeds)
 router.get('/restaurants/:id', authenticated, getRestaurant)
 
 // comments

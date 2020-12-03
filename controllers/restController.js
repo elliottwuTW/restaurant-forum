@@ -77,7 +77,26 @@ const getRestaurant = async (req, res) => {
   return res.render('restaurant', { restaurant: restaurant.toJSON() })
 }
 
+const getFeeds = async (req, res) => {
+  const restaurants = await Restaurant.findAll({
+    raw: true,
+    nest: true,
+    order: [['createdAt', 'DESC']],
+    limit: 10,
+    include: [Category]
+  })
+  const comments = await Comment.findAll({
+    raw: true,
+    nest: true,
+    order: [['createdAt', 'DESC']],
+    limit: 10,
+    include: [User, Restaurant]
+  })
+  return res.render('feeds', { restaurants, comments })
+}
+
 module.exports = {
   getRestaurants,
-  getRestaurant
+  getRestaurant,
+  getFeeds
 }

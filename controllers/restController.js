@@ -37,11 +37,16 @@ const getRestaurants = async (req, res) => {
   const favRestaurantIds = _helpers
     .getUser(req)
     .FavoritedRestaurants.map((favRes) => favRes.id)
+  const likeRestaurantsIds = _helpers
+    .getUser(req)
+    .LikedRestaurants.map((likeRes) => likeRes.id)
   const restaurants = result.rows.map((restaurant) => ({
     ...restaurant,
     description: restaurant.description.substring(0, 50),
     // if isFavorited by user
-    isFavorited: favRestaurantIds.includes(restaurant.id)
+    isFavorited: favRestaurantIds.includes(restaurant.id),
+    // if isLiked by user
+    isLiked: likeRestaurantsIds.includes(restaurant.id)
   }))
 
   // Pagination parameters for render
@@ -67,6 +72,7 @@ const getRestaurant = async (req, res) => {
     include: [
       Category,
       { model: User, as: 'FavoritedUsers' },
+      { model: User, as: 'LikedUsers' },
       {
         model: Comment,
         include: [User]
@@ -78,13 +84,14 @@ const getRestaurant = async (req, res) => {
     return res.redirect('back')
   }
   await restaurant.increment('viewCounts')
-  // if isFavorited by user
-  const isFavorited = restaurant.FavoritedUsers.map(
-    (favUser) => favUser.id
-  ).includes(_helpers.getUser(req).id)
+  // if isFavorited/Liked by user
+  const favUserIds = restaurant.FavoritedUsers.map((favUser) => favUser.id)
+  const likedUserIds = restaurant.LikedUsers.map((likedUser) => likedUser.id)
+
   return res.render('restaurant', {
     restaurant: restaurant.toJSON(),
-    isFavorited
+    isFavorited: favUserIds.includes(_helpers.getUser(req).id),
+    isLiked: likedUserIds.includes(_helpers.getUser(req).id)
   })
 }
 

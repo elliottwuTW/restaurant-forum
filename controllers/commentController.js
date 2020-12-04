@@ -1,6 +1,4 @@
-const db = require('../models')
-const Comment = db.Comment
-const Restaurant = db.Restaurant
+const { Comment, Restaurant } = require('../models')
 
 const { getUser } = require('../_helpers')
 

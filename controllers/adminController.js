@@ -1,7 +1,4 @@
-const db = require('../models')
-const User = db.User
-const Restaurant = db.Restaurant
-const Category = db.Category
+const { User, Restaurant, Category } = require('../models')
 
 const imgurUpload = require('../utils/imgurUpload')
 

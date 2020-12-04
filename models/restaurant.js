@@ -10,17 +10,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Restaurant.belongsTo(models.Category)
       Restaurant.hasMany(models.Comment)
-      // favorite
       Restaurant.belongsToMany(models.User, {
         through: models.Favorite,
         foreignKey: 'RestaurantId',
         as: 'FavoritedUsers'
-      })
-      // like
-      Restaurant.belongsToMany(models.User, {
-        through: models.Like,
-        foreignKey: 'RestaurantId',
-        as: 'LikedUsers'
       })
     }
   }
@@ -36,17 +29,17 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       tel: {
-        type: DataTypes.STRING
-        // defaultValue: '',
-        // validate: {
-        //   notEmpty: {
-        //     msg: '請填入餐廳電話'
-        //   },
-        //   is: {
-        //     args: /^\(?(0[0-9])\)?[-]([0-9]{4})[-]([0-9]{4})$/,
-        //     msg: '請確認電話格式'
-        //   }
-        // }
+        type: DataTypes.STRING,
+        defaultValue: '',
+        validate: {
+          notEmpty: {
+            msg: '請填入餐廳電話'
+          },
+          is: {
+            args: /^\(?(0[0-9])\)?[-]([0-9]{4})[-]([0-9]{4})$/,
+            msg: '請確認電話格式'
+          }
+        }
       },
       address: {
         type: DataTypes.STRING,

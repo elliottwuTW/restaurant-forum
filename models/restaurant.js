@@ -24,17 +24,17 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       tel: {
-        type: DataTypes.STRING,
-        defaultValue: '',
-        validate: {
-          notEmpty: {
-            msg: '請填入餐廳電話'
-          },
-          is: {
-            args: /^\(?(0[0-9])\)?[-]([0-9]{4})[-]([0-9]{4})$/,
-            msg: '請確認電話格式'
-          }
-        }
+        type: DataTypes.STRING
+        // defaultValue: '',
+        // validate: {
+        //   notEmpty: {
+        //     msg: '請填入餐廳電話'
+        //   },
+        //   is: {
+        //     args: /^\(?(0[0-9])\)?[-]([0-9]{4})[-]([0-9]{4})$/,
+        //     msg: '請確認電話格式'
+        //   }
+        // }
       },
       address: {
         type: DataTypes.STRING,
@@ -56,6 +56,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       description: DataTypes.TEXT,
       image: DataTypes.STRING,
+      viewCounts: DataTypes.INTEGER,
       CategoryId: DataTypes.INTEGER
     },
     {

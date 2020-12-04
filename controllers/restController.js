@@ -74,6 +74,7 @@ const getRestaurant = async (req, res) => {
     req.flash('error_messages', '餐廳中無此 id')
     return res.redirect('back')
   }
+  await restaurant.increment('viewCounts')
   return res.render('restaurant', { restaurant: restaurant.toJSON() })
 }
 
@@ -95,8 +96,21 @@ const getFeeds = async (req, res) => {
   return res.render('feeds', { restaurants, comments })
 }
 
+const getDashboard = async (req, res) => {
+  const restaurant = await Restaurant.findByPk(req.params.id, {
+    include: [Category, Comment]
+  })
+  if (!restaurant) {
+    req.flash('error_messages', '餐廳中無此 id')
+    return res.redirect('back')
+  }
+
+  return res.render('dashboard', { restaurant: restaurant.toJSON() })
+}
+
 module.exports = {
   getRestaurants,
   getRestaurant,
-  getFeeds
+  getFeeds,
+  getDashboard
 }

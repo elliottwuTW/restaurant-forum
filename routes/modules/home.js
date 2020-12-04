@@ -22,7 +22,9 @@ const {
   editUser,
   putUser,
   addFavorite,
-  removeFavorite
+  removeFavorite,
+  addLike,
+  removeLike
 } = require('../../controllers/userController')
 
 const {
@@ -51,6 +53,10 @@ router.put('/users/:id', authenticated, upload.single('image'), putUser)
 // favorite
 router.post('/favorite/:id', authenticated, addFavorite)
 router.delete('/favorite/:id', authenticated, removeFavorite)
+
+// like
+router.post('/like/:id', authenticated, addLike)
+router.delete('/like/:id', authenticated, removeLike)
 
 // signup/signin/logout
 router.get('/signup', signUpPage)

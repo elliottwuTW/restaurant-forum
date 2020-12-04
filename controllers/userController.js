@@ -1,4 +1,4 @@
-const { User, Comment, Restaurant, Favorite } = require('../models')
+const { User, Comment, Restaurant, Favorite, Like } = require('../models')
 
 const _helpers = require('../_helpers')
 
@@ -118,6 +118,34 @@ const removeFavorite = async (req, res) => {
   return res.redirect('back')
 }
 
+const addLike = async (req, res) => {
+  const restaurant = await checkRestaurantAndReturn(req, res)
+
+  await Like.create({
+    UserId: _helpers.getUser(req).id,
+    RestaurantId: restaurant.id
+  })
+  return res.redirect('back')
+}
+
+const removeLike = async (req, res) => {
+  const restaurant = await checkRestaurantAndReturn(req, res)
+
+  const like = await Like.findOne({
+    where: {
+      UserId: _helpers.getUser(req).id,
+      RestaurantId: restaurant.id
+    }
+  })
+  if (!like) {
+    req.flash('error_messages', '無此 id 按讚紀錄')
+    return res.redirect('back')
+  }
+
+  await like.destroy()
+  return res.redirect('back')
+}
+
 const checkUserAndReturn = async (req, res) => {
   const user = await User.findByPk(req.params.id, {
     include: [
@@ -153,5 +181,7 @@ module.exports = {
   editUser,
   putUser,
   addFavorite,
-  removeFavorite
+  removeFavorite,
+  addLike,
+  removeLike
 }

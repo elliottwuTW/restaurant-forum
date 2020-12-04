@@ -1,4 +1,11 @@
-const { User, Comment, Restaurant, Favorite, Like } = require('../models')
+const {
+  User,
+  Comment,
+  Restaurant,
+  Favorite,
+  Like,
+  Followship
+} = require('../models')
 
 const _helpers = require('../_helpers')
 
@@ -146,6 +153,54 @@ const removeLike = async (req, res) => {
   return res.redirect('back')
 }
 
+const getTopUser = async (req, res) => {
+  let users = await User.findAll({
+    // raw: true,
+    // nest: true,
+    include: [{ model: User, as: 'Followers' }]
+  })
+  const followingIds = _helpers
+    .getUser(req)
+    .Followings.map((following) => following.id)
+  // add isFollowed by this user
+  users = users.map((user) => ({
+    // ...user
+    ...user.dataValues,
+    isFollowed: followingIds.includes(user.id)
+  }))
+  // sorted by followers number
+  const compareFun = (a, b) => b.Followers.length - a.Followers.length
+  users = users.sort(compareFun)
+
+  return res.render('topUser', { users })
+}
+
+const addFollowing = async (req, res) => {
+  const user = await checkUserAndReturn(req, res)
+  if (user.id === _helpers.getUser(req).id) {
+    req.flash('error_messages', '使用者不能自行追蹤')
+    return res.redirect('back')
+  }
+  await Followship.create({
+    followerId: _helpers.getUser(req).id,
+    followingId: user.id
+  })
+  return res.redirect('back')
+}
+
+const removeFollowing = async (req, res) => {
+  const user = await checkUserAndReturn(req, res)
+  const followship = await Followship.findOne({
+    where: { followerId: _helpers.getUser(req).id, followingId: user.id }
+  })
+  if (!followship) {
+    req.flash('error_messages', '無此 id 追蹤紀錄')
+    return res.redirect('back')
+  }
+  await followship.destroy()
+  return res.redirect('back')
+}
+
 const checkUserAndReturn = async (req, res) => {
   const user = await User.findByPk(req.params.id, {
     include: [
@@ -183,5 +238,8 @@ module.exports = {
   addFavorite,
   removeFavorite,
   addLike,
-  removeLike
+  removeLike,
+  getTopUser,
+  addFollowing,
+  removeFollowing
 }

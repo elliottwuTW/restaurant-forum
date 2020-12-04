@@ -24,7 +24,10 @@ const {
   addFavorite,
   removeFavorite,
   addLike,
-  removeLike
+  removeLike,
+  getTopUser,
+  addFollowing,
+  removeFollowing
 } = require('../../controllers/userController')
 
 const {
@@ -46,6 +49,7 @@ router.post('/comments', authenticated, postComment)
 router.delete('/comments/:id', authenticated, isAdmin, deleteComment)
 
 // users
+router.get('/users/top', authenticated, getTopUser)
 router.get('/users/:id', authenticated, getUser)
 router.get('/users/:id/edit', authenticated, editUser)
 router.put('/users/:id', authenticated, upload.single('image'), putUser)
@@ -57,6 +61,10 @@ router.delete('/favorite/:id', authenticated, removeFavorite)
 // like
 router.post('/like/:id', authenticated, addLike)
 router.delete('/like/:id', authenticated, removeLike)
+
+// followship
+router.post('/following/:id', authenticated, addFollowing)
+router.delete('/following/:id', authenticated, removeFollowing)
 
 // signup/signin/logout
 router.get('/signup', signUpPage)

@@ -20,7 +20,9 @@ const {
   logout,
   getUser,
   editUser,
-  putUser
+  putUser,
+  addFavorite,
+  removeFavorite
 } = require('../../controllers/userController')
 
 const {
@@ -45,6 +47,10 @@ router.delete('/comments/:id', authenticated, isAdmin, deleteComment)
 router.get('/users/:id', authenticated, getUser)
 router.get('/users/:id/edit', authenticated, editUser)
 router.put('/users/:id', authenticated, upload.single('image'), putUser)
+
+// favorite
+router.post('/favorite/:id', authenticated, addFavorite)
+router.delete('/favorite/:id', authenticated, removeFavorite)
 
 // signup/signin/logout
 router.get('/signup', signUpPage)

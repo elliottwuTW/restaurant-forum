@@ -1,7 +1,4 @@
-const db = require('../models')
-const User = db.User
-const Comment = db.Comment
-const Restaurant = db.Restaurant
+const { User, Comment, Restaurant, Favorite } = require('../models')
 
 const _helpers = require('../_helpers')
 
@@ -95,6 +92,32 @@ const putUser = async (req, res) => {
   }
 }
 
+const addFavorite = async (req, res) => {
+  const restaurant = await checkRestaurantAndReturn(req, res)
+  await Favorite.create({
+    UserId: _helpers.getUser(req).id,
+    RestaurantId: restaurant.id
+  })
+  return res.redirect('back')
+}
+
+const removeFavorite = async (req, res) => {
+  const restaurant = await checkRestaurantAndReturn(req, res)
+  const favorite = await Favorite.findOne({
+    where: {
+      UserId: _helpers.getUser(req).id,
+      RestaurantId: restaurant.id
+    }
+  })
+  if (!favorite) {
+    req.flash('error_messages', '無此 id 收藏紀錄')
+    return res.redirect('back')
+  }
+
+  await favorite.destroy()
+  return res.redirect('back')
+}
+
 const checkUserAndReturn = async (req, res) => {
   const user = await User.findByPk(req.params.id, {
     include: [
@@ -111,6 +134,15 @@ const checkUserAndReturn = async (req, res) => {
   return user
 }
 
+const checkRestaurantAndReturn = async (req, res) => {
+  const restaurant = await Restaurant.findByPk(req.params.id)
+  if (!restaurant) {
+    req.flash('error_messages', '無此餐廳 id')
+    return res.redirect('back')
+  }
+  return restaurant
+}
+
 module.exports = {
   signUpPage,
   signUp,
@@ -119,5 +151,7 @@ module.exports = {
   logout,
   getUser,
   editUser,
-  putUser
+  putUser,
+  addFavorite,
+  removeFavorite
 }

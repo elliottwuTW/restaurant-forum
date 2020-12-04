@@ -1,8 +1,5 @@
-const db = require('../models')
-const Restaurant = db.Restaurant
-const Category = db.Category
-const Comment = db.Comment
-const User = db.User
+const { Restaurant, Category, Comment, User } = require('../models')
+const _helpers = require('../_helpers')
 
 const getRestaurants = async (req, res) => {
   const reqQuery = {}
@@ -37,9 +34,14 @@ const getRestaurants = async (req, res) => {
     limit: pageLimit
   })
   // reconstruct data for render
+  const favRestaurantIds = _helpers
+    .getUser(req)
+    .FavoritedRestaurants.map((favRes) => favRes.id)
   const restaurants = result.rows.map((restaurant) => ({
     ...restaurant,
-    description: restaurant.description.substring(0, 50)
+    description: restaurant.description.substring(0, 50),
+    // if isFavorited by user
+    isFavorited: favRestaurantIds.includes(restaurant.id)
   }))
 
   // Pagination parameters for render
@@ -64,6 +66,7 @@ const getRestaurant = async (req, res) => {
   const restaurant = await Restaurant.findByPk(req.params.id, {
     include: [
       Category,
+      { model: User, as: 'FavoritedUsers' },
       {
         model: Comment,
         include: [User]
@@ -75,7 +78,14 @@ const getRestaurant = async (req, res) => {
     return res.redirect('back')
   }
   await restaurant.increment('viewCounts')
-  return res.render('restaurant', { restaurant: restaurant.toJSON() })
+  // if isFavorited by user
+  const isFavorited = restaurant.FavoritedUsers.map(
+    (favUser) => favUser.id
+  ).includes(_helpers.getUser(req).id)
+  return res.render('restaurant', {
+    restaurant: restaurant.toJSON(),
+    isFavorited
+  })
 }
 
 const getFeeds = async (req, res) => {

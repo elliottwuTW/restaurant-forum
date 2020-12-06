@@ -13,7 +13,7 @@ module.exports = {
         name: 'root',
         createdAt: new Date(),
         updatedAt: new Date(),
-        image: `https://loremflickr.com/320/240/man,woman/?random=${
+        image: `https://loremflickr.com/320/240/man,woman/?lock=${
           Math.random() * 100
         }`
       },
@@ -25,7 +25,7 @@ module.exports = {
         name: 'user1',
         createdAt: new Date(),
         updatedAt: new Date(),
-        image: `https://loremflickr.com/320/240/man,woman/?random=${
+        image: `https://loremflickr.com/320/240/man,woman/?lock=${
           Math.random() * 100
         }`
       },
@@ -37,7 +37,7 @@ module.exports = {
         name: 'user2',
         createdAt: new Date(),
         updatedAt: new Date(),
-        image: `https://loremflickr.com/320/240/man,woman/?random=${
+        image: `https://loremflickr.com/320/240/man,woman/?lock=${
           Math.random() * 100
         }`
       }

@@ -125,9 +125,27 @@ const getDashboard = async (req, res) => {
   return res.render('dashboard', { restaurant: restaurant.toJSON() })
 }
 
+const getTop10Restaurants = async (req, res) => {
+  let restaurants = await Restaurant.findAll({
+    include: [{ model: User, as: 'FavoritedUsers' }]
+  })
+  const favRestaurantIds = _helpers
+    .getUser(req)
+    .FavoritedRestaurants.map((favRes) => favRes.id)
+  restaurants = restaurants.map((restaurant) => ({
+    ...restaurant.dataValues,
+    isFavorited: favRestaurantIds.includes(restaurant.id)
+  }))
+  restaurants = restaurants.sort(
+    (a, b) => b.FavoritedUsers.length - a.FavoritedUsers.length
+  )
+  return res.render('topRestaurant', { restaurants: restaurants.slice(0, 10) })
+}
+
 module.exports = {
   getRestaurants,
   getRestaurant,
   getFeeds,
-  getDashboard
+  getDashboard,
+  getTop10Restaurants
 }

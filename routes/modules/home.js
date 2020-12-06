@@ -10,7 +10,8 @@ const {
   getRestaurants,
   getRestaurant,
   getFeeds,
-  getDashboard
+  getDashboard,
+  getTop10Restaurants
 } = require('../../controllers/restController')
 const {
   signUpPage,
@@ -41,6 +42,7 @@ const { authenticated, isAdmin } = require('../../middleware/auth')
 router.get('/', (req, res) => res.redirect('/restaurants'))
 router.get('/restaurants', authenticated, getRestaurants)
 router.get('/restaurants/feeds', authenticated, getFeeds)
+router.get('/restaurants/top', authenticated, getTop10Restaurants)
 router.get('/restaurants/:id', authenticated, getRestaurant)
 router.get('/restaurants/:id/dashboard', authenticated, getDashboard)
 

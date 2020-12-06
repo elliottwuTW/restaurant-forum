@@ -64,8 +64,13 @@ const logout = (req, res) => {
 }
 
 const getUser = async (req, res) => {
-  const user = await checkUserAndReturn(req, res)
-  return res.render('user', { displayUser: user.toJSON() })
+  const user = (await checkUserAndReturn(req, res)).toJSON()
+  const commentedResIds = user.Comments.map((comment) => comment.RestaurantId)
+  const duplicateIndex = findDuplicateIndex(commentedResIds)
+  user.Comments = user.Comments.filter(
+    (_, index) => !duplicateIndex.includes(index)
+  )
+  return res.render('user', { displayUser: user })
 }
 
 const editUser = async (req, res) => {
@@ -207,6 +212,18 @@ const checkUserAndReturn = async (req, res) => {
       {
         model: Comment,
         include: [Restaurant]
+      },
+      {
+        model: Restaurant,
+        as: 'FavoritedRestaurants'
+      },
+      {
+        model: User,
+        as: 'Followers'
+      },
+      {
+        model: User,
+        as: 'Followings'
       }
     ]
   })
@@ -224,6 +241,28 @@ const checkRestaurantAndReturn = async (req, res) => {
     return res.redirect('back')
   }
   return restaurant
+}
+
+const findDuplicateIndex = (targetArr) => {
+  const duplicateIndex = []
+  for (let index = 0; index < targetArr.length; index++) {
+    if (!duplicateIndex.includes(index)) {
+      const currentId = targetArr[index]
+      for (
+        let compIndex = index + 1;
+        compIndex < targetArr.length;
+        compIndex++
+      ) {
+        if (
+          !duplicateIndex.includes(compIndex) &&
+          currentId === targetArr[compIndex]
+        ) {
+          duplicateIndex.push(compIndex)
+        }
+      }
+    }
+  }
+  return duplicateIndex
 }
 
 module.exports = {

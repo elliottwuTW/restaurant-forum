@@ -1,6 +1,8 @@
 const db = require('../models')
 const Category = db.Category
 
+const categoryService = require('../services/categoryService')
+
 // error handle method
 const {
   allValidationError,
@@ -8,25 +10,22 @@ const {
 } = require('../utils/errorHandleHelper')
 
 const getCategories = async (req, res) => {
-  const categories = await Category.findAll({
-    raw: true,
-    nest: true,
-    order: [['updatedAt', 'DESC']]
-  })
-  if (!req.params.id) {
-    return res.render('admin/categories', { categories })
-  } else {
-    const category = await Category.findByPk(req.params.id)
-    if (!category) {
-      req.flash('error_messages', '分類中無此 id')
+  categoryService.getCategories(req, res, (result) => {
+    if (result.success === true) {
+      const data = result.data
+      if (req.params.id) {
+        return res.render('admin/categories', {
+          categories: data.categories,
+          category: data.category
+        })
+      } else {
+        return res.render('admin/categories', { categories: data })
+      }
+    } else {
+      req.flash('error_messages', `${result.message}`)
       return res.redirect('/admin/categories')
     }
-
-    return res.render('admin/categories', {
-      categories,
-      category: category.toJSON()
-    })
-  }
+  })
 }
 
 const createCategory = async (req, res) => {

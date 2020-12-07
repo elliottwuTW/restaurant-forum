@@ -1,7 +1,12 @@
 const express = require('express')
 const router = express.Router()
 
-const { getRestaurants } = require('../../controllers/api/adminController')
+const {
+  getRestaurants,
+  getRestaurant
+} = require('../../controllers/api/adminController')
+
+const { getCategories } = require('../../controllers/api/categoryController')
 
 router.get('/', (req, res) => {
   res.redirect('/api/admin/restaurants')
@@ -9,5 +14,10 @@ router.get('/', (req, res) => {
 
 // restaurants
 router.get('/restaurants', getRestaurants)
+router.get('/restaurants/:id', getRestaurant)
+
+// categories
+router.get('/categories', getCategories)
+router.get('/categories/:id', getCategories)
 
 module.exports = router

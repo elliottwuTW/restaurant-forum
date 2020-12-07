@@ -1,5 +1,6 @@
 const { User, Restaurant, Category } = require('../models')
 
+// controller service
 const adminService = require('../services/adminService')
 
 const imgurUpload = require('../utils/imgurUpload')
@@ -62,10 +63,9 @@ const postRestaurant = async (req, res) => {
 
 // Read a specific restaurant
 const getRestaurant = async (req, res) => {
-  const restaurant = await Restaurant.findByPk(req.params.id, {
-    include: { model: Category, attributes: ['name'] }
+  adminService.getRestaurant(req, res, (data) => {
+    return res.render('admin/restaurant', data)
   })
-  return res.render('admin/restaurant', { restaurant: restaurant.toJSON() })
 }
 
 // Edit restaurant page

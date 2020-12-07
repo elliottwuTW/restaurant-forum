@@ -3,7 +3,8 @@ const router = express.Router()
 
 const {
   getRestaurants,
-  getRestaurant
+  getRestaurant,
+  deleteRestaurant
 } = require('../../controllers/api/adminController')
 
 const { getCategories } = require('../../controllers/api/categoryController')
@@ -15,6 +16,7 @@ router.get('/', (req, res) => {
 // restaurants
 router.get('/restaurants', getRestaurants)
 router.get('/restaurants/:id', getRestaurant)
+router.delete('/restaurants/:id', deleteRestaurant)
 
 // categories
 router.get('/categories', getCategories)

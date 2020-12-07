@@ -2,18 +2,25 @@
 const adminService = require('../../services/adminService')
 
 const getRestaurants = async (req, res) => {
-  adminService.getRestaurants(req, res, (data) => {
-    return res.json(data)
+  adminService.getRestaurants(req, res, (result) => {
+    return res.json(result)
   })
 }
 
 const getRestaurant = async (req, res) => {
-  adminService.getRestaurant(req, res, (data) => {
-    return res.json(data)
+  adminService.getRestaurant(req, res, (result) => {
+    return res.json(result)
+  })
+}
+
+const deleteRestaurant = async (req, res) => {
+  adminService.deleteRestaurant(req, res, (result) => {
+    return res.json(result)
   })
 }
 
 module.exports = {
   getRestaurants,
-  getRestaurant
+  getRestaurant,
+  deleteRestaurant
 }

@@ -13,8 +13,8 @@ const {
 
 // Get all restaurants
 const getRestaurants = async (req, res) => {
-  adminService.getRestaurants(req, res, (data) => {
-    return res.render('admin/restaurants', data)
+  adminService.getRestaurants(req, res, (result) => {
+    return res.render('admin/restaurants', result)
   })
 }
 
@@ -63,8 +63,8 @@ const postRestaurant = async (req, res) => {
 
 // Read a specific restaurant
 const getRestaurant = async (req, res) => {
-  adminService.getRestaurant(req, res, (data) => {
-    return res.render('admin/restaurant', data)
+  adminService.getRestaurant(req, res, (result) => {
+    return res.render('admin/restaurant', result)
   })
 }
 
@@ -119,8 +119,11 @@ const updateRestaurant = async (req, res) => {
 
 // Delete a specific restaurant
 const deleteRestaurant = async (req, res) => {
-  await Restaurant.destroy({ where: { id: req.params.id } })
-  return res.redirect('/admin/restaurants')
+  adminService.deleteRestaurant(req, res, (result) => {
+    if (result.success === true) {
+      return res.redirect('/admin/restaurants')
+    }
+  })
 }
 
 // Get all users

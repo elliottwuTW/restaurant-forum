@@ -1,6 +1,12 @@
 const db = require('../models')
 const Category = db.Category
 
+// error handle method
+const {
+  allValidationError,
+  errorMsgToArray
+} = require('../utils/errorHandleHelper')
+
 const getCategories = async (req, res, callback) => {
   const categories = await Category.findAll({
     raw: true,
@@ -24,6 +30,22 @@ const getCategories = async (req, res, callback) => {
   }
 }
 
+const createCategory = async (req, res, callback) => {
+  if (!req.body.name) req.body.name = ''
+  try {
+    const category = await Category.create(req.body)
+    callback({ success: true, message: '分類名稱建立成功', data: category })
+  } catch (err) {
+    if (allValidationError(err.errors)) {
+      const validationErrorMsg = errorMsgToArray(err.message)[0]
+      callback({ success: false, message: validationErrorMsg, data: {} })
+    } else {
+      console.error(err)
+    }
+  }
+}
+
 module.exports = {
-  getCategories
+  getCategories,
+  createCategory
 }

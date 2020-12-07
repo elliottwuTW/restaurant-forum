@@ -12,7 +12,10 @@ const {
   deleteRestaurant
 } = require('../../controllers/api/adminController')
 
-const { getCategories } = require('../../controllers/api/categoryController')
+const {
+  getCategories,
+  createCategory
+} = require('../../controllers/api/categoryController')
 
 router.get('/', (req, res) => {
   res.redirect('/api/admin/restaurants')
@@ -28,5 +31,6 @@ router.delete('/restaurants/:id', deleteRestaurant)
 // categories
 router.get('/categories', getCategories)
 router.get('/categories/:id', getCategories)
+router.post('/categories', createCategory)
 
 module.exports = router

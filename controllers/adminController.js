@@ -1,5 +1,7 @@
 const { User, Restaurant, Category } = require('../models')
 
+const adminService = require('../services/adminService')
+
 const imgurUpload = require('../utils/imgurUpload')
 
 // error handle method
@@ -10,13 +12,9 @@ const {
 
 // Get all restaurants
 const getRestaurants = async (req, res) => {
-  const restaurants = await Restaurant.findAll({
-    raw: true,
-    nest: true,
-    order: [['updatedAt', 'DESC']],
-    include: { model: Category, attributes: ['name'] }
+  adminService.getRestaurants(req, res, (data) => {
+    return res.render('admin/restaurants', data)
   })
-  return res.render('admin/restaurants', { restaurants })
 }
 
 // New restaurant page

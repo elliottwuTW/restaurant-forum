@@ -26,39 +26,20 @@ const createRestaurant = async (req, res) => {
 
 // Create an restaurant
 const postRestaurant = async (req, res) => {
-  // check if file exists in req
-  const { file } = req
-  try {
-    if (file) {
-      const img = await imgurUpload(file)
-      await Restaurant.create({
-        ...req.body,
-        image: img.data.link,
-        // Foreign key
-        CategoryId: req.body.CategoryId
-      })
+  adminService.postRestaurant(req, res, async (result) => {
+    if (result.success === true) {
+      req.flash('success_messages', result.message)
+      return res.redirect('/admin/restaurants')
     } else {
-      await Restaurant.create({
-        ...req.body,
-        image: null,
-        CategoryId: req.body.CategoryId
-      })
-    }
-    req.flash('success_messages', '餐廳建立成功')
-    return res.redirect('/admin/restaurants')
-  } catch (err) {
-    if (allValidationError(err.errors)) {
-      const validationErrorMsg = errorMsgToArray(err.message)
       const categories = await Category.findAll({ raw: true, nest: true })
+      const validationErrorMsg = result.message
       return res.render('admin/create', {
         restaurant: req.body,
         categories,
         validationErrorMsg
       })
-    } else {
-      console.error(err)
     }
-  }
+  })
 }
 
 // Read a specific restaurant

@@ -1,9 +1,13 @@
 const express = require('express')
 const router = express.Router()
 
+const multer = require('multer')
+const upload = multer({ dest: 'temp/' })
+
 const {
   getRestaurants,
   getRestaurant,
+  postRestaurant,
   deleteRestaurant
 } = require('../../controllers/api/adminController')
 
@@ -16,6 +20,7 @@ router.get('/', (req, res) => {
 // restaurants
 router.get('/restaurants', getRestaurants)
 router.get('/restaurants/:id', getRestaurant)
+router.post('/restaurants', upload.single('image'), postRestaurant)
 router.delete('/restaurants/:id', deleteRestaurant)
 
 // categories

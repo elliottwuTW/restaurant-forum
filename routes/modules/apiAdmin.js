@@ -15,7 +15,8 @@ const {
 const {
   getCategories,
   createCategory,
-  putCategory
+  putCategory,
+  deleteCategory
 } = require('../../controllers/api/categoryController')
 
 router.get('/', (req, res) => {
@@ -34,5 +35,6 @@ router.get('/categories', getCategories)
 router.get('/categories/:id', getCategories)
 router.post('/categories', createCategory)
 router.put('/categories/:id', putCategory)
+router.delete('/categories/:id', deleteCategory)
 
 module.exports = router

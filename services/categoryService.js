@@ -65,8 +65,18 @@ const putCategory = async (req, res, callback) => {
   }
 }
 
+const deleteCategory = async (req, res, callback) => {
+  let category = await Category.findByPk(req.params.id)
+  if (!category) {
+    return callback({ success: false, message: '分類中無此 id', data: {} })
+  }
+  category = await category.destroy()
+  callback({ success: true, message: '分類刪除成功', data: category })
+}
+
 module.exports = {
   getCategories,
   createCategory,
-  putCategory
+  putCategory,
+  deleteCategory
 }

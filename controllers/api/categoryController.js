@@ -22,8 +22,15 @@ const putCategory = async (req, res) => {
   })
 }
 
+const deleteCategory = async (req, res) => {
+  categoryService.deleteCategory(req, res, (result) => {
+    return res.json(result)
+  })
+}
+
 module.exports = {
   getCategories,
   createCategory,
-  putCategory
+  putCategory,
+  deleteCategory
 }

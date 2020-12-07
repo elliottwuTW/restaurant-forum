@@ -19,6 +19,12 @@ const postRestaurant = async (req, res) => {
   })
 }
 
+const updateRestaurant = async (req, res) => {
+  adminService.updateRestaurant(req, res, (result) => {
+    return res.json(result)
+  })
+}
+
 const deleteRestaurant = async (req, res) => {
   adminService.deleteRestaurant(req, res, (result) => {
     return res.json(result)
@@ -29,5 +35,6 @@ module.exports = {
   getRestaurants,
   getRestaurant,
   postRestaurant,
+  updateRestaurant,
   deleteRestaurant
 }

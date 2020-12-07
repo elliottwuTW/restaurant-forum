@@ -64,6 +64,38 @@ const postRestaurant = async (req, res, callback) => {
   }
 }
 
+// Update a specific restaurant
+const updateRestaurant = async (req, res, callback) => {
+  const { file } = req
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.id)
+    if (!restaurant) {
+      callback({ success: false, message: '餐廳中無此 id', data: {} })
+    }
+
+    if (file) {
+      const img = await imgurUpload(file)
+      await restaurant.update({
+        ...req.body,
+        image: img.data.link
+      })
+    } else {
+      await restaurant.update({
+        ...req.body,
+        image: restaurant.image
+      })
+    }
+    callback({ success: true, message: '餐廳資料更新成功', data: restaurant })
+  } catch (err) {
+    if (allValidationError(err.errors)) {
+      const validationErrorMsg = errorMsgToArray(err.message)
+      callback({ success: false, message: validationErrorMsg, data: {} })
+    } else {
+      console.error(err)
+    }
+  }
+}
+
 // Delete a specific restaurant
 const deleteRestaurant = async (req, res, callback) => {
   await Restaurant.destroy({ where: { id: req.params.id } })
@@ -74,5 +106,6 @@ module.exports = {
   getRestaurants,
   getRestaurant,
   postRestaurant,
+  updateRestaurant,
   deleteRestaurant
 }

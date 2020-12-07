@@ -8,6 +8,7 @@ const {
   getRestaurants,
   getRestaurant,
   postRestaurant,
+  updateRestaurant,
   deleteRestaurant
 } = require('../../controllers/api/adminController')
 
@@ -21,6 +22,7 @@ router.get('/', (req, res) => {
 router.get('/restaurants', getRestaurants)
 router.get('/restaurants/:id', getRestaurant)
 router.post('/restaurants', upload.single('image'), postRestaurant)
+router.put('/restaurants/:id', upload.single('image'), updateRestaurant)
 router.delete('/restaurants/:id', deleteRestaurant)
 
 // categories

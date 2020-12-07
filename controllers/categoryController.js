@@ -41,28 +41,14 @@ const createCategory = async (req, res) => {
 }
 
 const putCategory = async (req, res) => {
-  // check name
-  if (!req.body.name) {
-    req.flash('error_messages', '分類名稱不可為空')
-    return res.redirect('back')
-  }
-  const category = await Category.findByPk(req.params.id)
-  if (!category) {
-    req.flash('error_messages', '分類中無此 id')
-    return res.redirect('back')
-  }
-  try {
-    await category.update(req.body)
-    return res.redirect('/admin/categories')
-  } catch (err) {
-    if (allValidationError(err.errors)) {
-      const validationErrorMsg = errorMsgToArray(err.message)[0]
-      req.flash('error_messages', validationErrorMsg)
-      return res.redirect('/admin/categories')
+  categoryService.putCategory(req, res, (result) => {
+    if (result.success === true) {
+      req.flash('success_messages', result.message)
     } else {
-      console.error(err)
+      req.flash('error_messages', result.message)
     }
-  }
+    return res.redirect('/admin/categories')
+  })
 }
 
 const deleteCategory = async (req, res) => {

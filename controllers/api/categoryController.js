@@ -16,7 +16,14 @@ const createCategory = async (req, res) => {
   })
 }
 
+const putCategory = async (req, res) => {
+  categoryService.putCategory(req, res, (result) => {
+    return res.json(result)
+  })
+}
+
 module.exports = {
   getCategories,
-  createCategory
+  createCategory,
+  putCategory
 }

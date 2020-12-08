@@ -55,4 +55,42 @@ passport.deserializeUser((id, done) => {
   })
 })
 
+// JWT
+const passportJWT = require('passport-jwt')
+const JwtStrategy = passportJWT.Strategy
+const ExtractJwt = passportJWT.ExtractJwt
+var jwtOptions = {}
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken()
+jwtOptions.secretOrKey = process.env.JWT_SECRET
+
+passport.use(
+  new JwtStrategy(jwtOptions, function (payload, done) {
+    User.findByPk(payload.id, {
+      include: [
+        {
+          model: Restaurant,
+          as: 'FavoritedRestaurants'
+        },
+        {
+          model: Restaurant,
+          as: 'LikedRestaurants'
+        },
+        {
+          model: User,
+          as: 'Followers'
+        },
+        {
+          model: User,
+          as: 'Followings'
+        }
+      ]
+    }).then((user) => {
+      if (!user) {
+        return done(null, false)
+      }
+      return done(null, user)
+    })
+  })
+)
+
 module.exports = passport

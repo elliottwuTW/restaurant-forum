@@ -19,9 +19,14 @@ const {
   deleteCategory
 } = require('../../controllers/api/categoryController')
 
+const { apiAuthenticated, apiIsAdmin } = require('../../middleware/auth')
+
 router.get('/', (req, res) => {
   res.redirect('/api/admin/restaurants')
 })
+
+router.use(apiAuthenticated)
+router.use(apiIsAdmin)
 
 // restaurants
 router.get('/restaurants', getRestaurants)

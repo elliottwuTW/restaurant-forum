@@ -1,3 +1,5 @@
+const passport = require('passport')
+
 const helpers = require('../_helpers')
 
 const authenticated = (req, res, next) => {
@@ -14,7 +16,22 @@ const isAdmin = (req, res, next) => {
   next()
 }
 
+const apiAuthenticated = passport.authenticate('jwt', { session: false })
+
+const apiIsAdmin = (req, res, next) => {
+  if (req.user.isAdmin) {
+    return next()
+  } else {
+    return res.status(401).json({
+      success: false,
+      message: '權限不足'
+    })
+  }
+}
+
 module.exports = {
   authenticated,
-  isAdmin
+  isAdmin,
+  apiAuthenticated,
+  apiIsAdmin
 }

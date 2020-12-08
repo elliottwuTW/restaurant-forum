@@ -8,7 +8,6 @@ const methodOverride = require('method-override')
 const dotenv = require('dotenv')
 
 const db = require('./models')
-const passport = require('./config/passport')
 const _helpers = require('./_helpers')
 const helpers = require('./utils/exphbsHelper')
 const app = express()
@@ -16,6 +15,7 @@ const app = express()
 if (process.env.NODE_ENV !== 'production') {
   dotenv.config()
 }
+const passport = require('./config/passport')
 
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs', helpers }))
 app.set('view engine', 'hbs')

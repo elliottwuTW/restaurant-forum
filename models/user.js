@@ -79,5 +79,9 @@ module.exports = (sequelize, DataTypes) => {
     const hash = bcrypt.hashSync(user.password, salt)
     user.password = hash
   })
+  // match the password
+  User.prototype.matchPassword = async function (password) {
+    return await bcrypt.compare(password, this.password)
+  }
   return User
 }

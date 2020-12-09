@@ -1,4 +1,5 @@
-const { Restaurant, Category, Comment, User } = require('../models')
+const { Restaurant, Category, Comment, User, Favorite } = require('../models')
+const sequelize = require('sequelize')
 const _helpers = require('../_helpers')
 
 const getRestaurants = async (req, res) => {
@@ -126,20 +127,35 @@ const getDashboard = async (req, res) => {
 }
 
 const getTop10Restaurants = async (req, res) => {
+  // query top10 restaurants
   let restaurants = await Restaurant.findAll({
-    include: [{ model: User, as: 'FavoritedUsers' }]
+    attributes: {
+      include: [
+        [
+          sequelize.literal(
+            '(SELECT COUNT(DISTINCT Favorite.UserId) FROM Favorites AS Favorite WHERE Favorite.RestaurantId = Restaurant.id)'
+          ),
+          'favoriteCount'
+        ]
+      ]
+    },
+    order: [[sequelize.literal('favoriteCount'), 'DESC']],
+    limit: 10,
+    raw: true,
+    nest: true
   })
+
   const favRestaurantIds = _helpers
     .getUser(req)
     .FavoritedRestaurants.map((favRes) => favRes.id)
+
+  // add isFavorited
   restaurants = restaurants.map((restaurant) => ({
-    ...restaurant.dataValues,
+    ...restaurant,
     isFavorited: favRestaurantIds.includes(restaurant.id)
   }))
-  restaurants = restaurants.sort(
-    (a, b) => b.FavoritedUsers.length - a.FavoritedUsers.length
-  )
-  return res.render('topRestaurant', { restaurants: restaurants.slice(0, 10) })
+
+  return res.render('topRestaurant', { restaurants })
 }
 
 module.exports = {
